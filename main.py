@@ -193,11 +193,22 @@ def write_info(token):
     with open(f'{gather_discord_username(token=token)}.json', 'w') as file:
         json.dump(user_info, file, indent=4)
 
+def check_token(token):
+        
+    if requests.get('https://discord.com/api/v9/users/@me', headers=getheaders(token)).status_code == 200:
+        pass
+    else:
+        print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.RED} Wrong token !')
+        input()
+        exit()
+
 def Mass_Dm():
     token = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter Token to MassDm :')
+    check_token(token=token)
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Sucessfully log into {gather_discord_username(token=token)}')
     write_info(token=token)
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Target account info upload to {Fore.RED}{gather_discord_username(token=token)}.json{Fore.RED}')
+    content = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter the message to sent trough {Fore.RED}{gather_discord_username(token=token)}{Fore.RED} account :')
     
 def main():
     set_console_title(f'DMIZE - Mass DM | connect as {gather_discord_username(token=gather_token())} : {gather_discord_phone(token=gather_token())}')
