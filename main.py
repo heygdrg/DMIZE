@@ -15,6 +15,8 @@ modules = [
 
 missing_modules = []
 proxy_list = []
+id_list = []
+guild_list = []
 
 def gather_modules():
 
@@ -200,7 +202,7 @@ def absolute_path():
 def write_info(token):
     is_path_exist(token=token)
     user_info = requests.get('https://discord.com/api/v6/users/@me', headers=getheaders(token)).json()
-    with open(f'{gather_discord_username(token=token)}.json', 'w') as file:
+    with open(f'users/{gather_discord_username(token=token)}.json', 'w') as file:
         json.dump(user_info, file, indent=4)
 
 def check_token(token):
@@ -212,33 +214,39 @@ def check_token(token):
         input()
         exit()
 
-def Mass_Dm():
-    
+def Mass_Dm():  
     #still in dev
-    def spam_mp(content):
-        try:
-            channel = requests.get("https://discord.com/api/v9/users/@me/channels", headers=getheaders(token))
+    def gather_private_channel():
+        return requests.get("https://discord.com/api/v9/users/@me/channels", headers=getheaders(token)).json()
+
+    def append_private():
+        for conv in gather_private_channel():id_list.append(int(conv["id"]))
+
+    def gather_guilds():
+        return requests.get("https://discord.com/api/v9/users/@me/guilds", headers=getheaders(token)).json()
+
+    def append_guilds():
+        for guilds in gather_guilds(): guild_list.append(int(guilds["id"]))
+
+    def gather_guild_channels(guild_id):
+        return requests.get(f'https://discord.com/api/v8/guilds/{guild_id}/channels',headers=getheaders(token)).json()
+
+    def gather_channels_content(channel_id):
+        return requests.get(f'https://discord.com/api/v8/channels/{channel_id}/messages', headers=getheaders(token)).json()
+
+    def append_guilds():
+        for guild_id in guild_list:
+            for channel in gather_guild_channels(guild_id):
+                for message in gather_channels_content(channel_id=channel['id']):
+                    try: 
+                        if message['author']['id'] not in id_list:id_list.append(message['author']['id'])
+                    except: pass
+
+    def gather_ids():
+        append_private()
+        append_guilds()
 
 
-            for element in channel.json():
-                id_channel = element['id']
-                try:
-                    requests.get(f'https://discord.com/api/v9/channels/{id_channel}/messages',
-                    data={"content": f"{content}"},
-                    headers={'Authorization': token})
-                    
-                    if 'message' == 'Unknown Channel':
-                        print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE}{Fore.RED} An error occured while sending mp {Fore.RED}')
-                    
-                    else:
-                         print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Scraping dm : {id_channel}')
-                except:
-                        print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE}{Fore.RED} An error occured while sending mp {Fore.RED}')
-        except:
-            print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE}{Fore.RED} An error occured while sending mp {Fore.RED}')
-            print(channel)
-
-    
     token = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter Token to MassDm :')
     check_token(token=token)
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Sucessfully log into {gather_discord_username(token=token)}')
@@ -257,4 +265,4 @@ def main():
     input()
 
 if __name__ == "__main__":
-    Mass_Dm()
+    main()
