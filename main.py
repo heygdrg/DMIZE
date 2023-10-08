@@ -287,8 +287,6 @@ def Mass_Dm():
         gather_ids()
         for id in id_list:create_private_channel(id)
 
-    DMIZE()
-
     token = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter Token to MassDm :')
     check_token(token=token)
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Sucessfully log into {gather_discord_username(token=token)}')
@@ -297,7 +295,7 @@ def Mass_Dm():
     content = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter the message to sent trough {Fore.RED}{gather_discord_username(token=token)}{Fore.RED}{Fore.WHITE} account :')
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Target account info upload to {Fore.RED}{gather_discord_username(token=token)}.json{Fore.RED}')
     input(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Enter to start the attack ...')
-    DMIZE()
+    DMIZE(token = token , content= content)
    
 def main():
     set_console_title(f'DMIZE - Mass DM | connect as {gather_discord_username(token=gather_token())} : {gather_discord_phone(token=gather_token())}')
