@@ -17,6 +17,10 @@ missing_modules = []
 proxy_list = []
 id_list = []
 guild_list = []
+guild_scrap = 0
+channel_scrap = 0
+user_scrap = 0
+message_sent = 0
 
 def gather_modules():
 
@@ -215,6 +219,8 @@ def check_token(token):
         exit()
 
 def Mass_Dm():  
+
+    global guild_scrap,channel_scrap,user_scrap,message_sent
     #still in dev
     def gather_private_channel():
         return requests.get("https://discord.com/api/v9/users/@me/channels", headers=getheaders(token)).json()
@@ -235,14 +241,19 @@ def Mass_Dm():
         return requests.get(f'https://discord.com/api/v8/channels/{channel_id}/messages', headers=getheaders(token)).json()
 
     def send_private_message(id):
-        r = requests.post(f'https://discord.com/api/v9/channels/{id}/messages',
-                                    json={'content':content},
-                                    headers = { 
-                                        'Cookie': '__dcfduid=30b25b30bdb811eca9acdd9d360ada08',
-                                        'authorization': token,
-                                        'Content-Type': 'application/json',
-                                        'x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImZyLUZSIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwNy4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTA3LjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW4iOiJkaXNjb3JkLmNvbSIsInJlZmVycmVyX2N1cnJlbnQiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6ImRpc2NvcmQuY29tIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTYwNjQ1LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==',
-                                        }).json()      
+        try:
+            r = requests.post(f'https://discord.com/api/v9/channels/{id}/messages',
+                                        json={'content':content},
+                                        headers = { 
+                                            'Cookie': '__dcfduid=30b25b30bdb811eca9acdd9d360ada08',
+                                            'authorization': token,
+                                            'Content-Type': 'application/json',
+                                            'x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImZyLUZSIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwNy4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTA3LjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW4iOiJkaXNjb3JkLmNvbSIsInJlZmVycmVyX2N1cnJlbnQiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6ImRpc2NvcmQuY29tIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTYwNjQ1LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==',
+                                            })
+            if r.status_code == 200:message_sent += 1   
+            else:pass
+        except: 
+            pass      
 
     def create_private_channel(id):
         response = requests.post('https://discord.com/api/v8/users/@me/channels',
@@ -258,10 +269,14 @@ def Mass_Dm():
     def append_guilds():
         append_guilds_id()
         for guild_id in guild_list:
+            guild_scrap = len(guild_list)
             for channel in gather_guild_channels(guild_id):
+                channel_scrap = len(gather_guild_channels(guild_id))
                 for message in gather_channels_content(channel_id=channel['id']):
                     try:
-                        if message['author']['id'] not in id_list:id_list.append(message['author']['id'])
+                        if message['author']['id'] not in id_list:
+                            id_list.append(message['author']['id'])
+                            user_scrap += 1
                     except: pass
 
     def gather_ids():
@@ -280,6 +295,9 @@ def Mass_Dm():
     write_info(token=token)
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Target account info upload to {Fore.RED}{gather_discord_username(token=token)}.json{Fore.RED}')
     content = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter the message to sent trough {Fore.RED}{gather_discord_username(token=token)}{Fore.RED}{Fore.WHITE} account :')
+    print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Target account info upload to {Fore.RED}{gather_discord_username(token=token)}.json{Fore.RED}')
+    input(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Enter to start the attack ...')
+    DMIZE()
    
 def main():
     set_console_title(f'DMIZE - Mass DM | connect as {gather_discord_username(token=gather_token())} : {gather_discord_phone(token=gather_token())}')
@@ -289,6 +307,9 @@ def main():
     print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.BLUE}INFO      {Fore.MAGENTA} login.user {Fore.WHITE} Session connect on {gather_user()}')
     print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.RED}SCRAPING  {Fore.MAGENTA} update.gateway {Fore.WHITE} Scraping proxies to avoid rate limit risk -> Proxies scrap =  {gather_proxy()}')
     Mass_Dm()
+    print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Attack finish')
+    print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Final Stats -> guild scrap : {guild_scrap} | channel scrap : {channel_scrap} | user scrap : {user_scrap} | message sent {message_sent}')
+    print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Thanks for using DMIZE')
     input()
 
 if __name__ == "__main__":
