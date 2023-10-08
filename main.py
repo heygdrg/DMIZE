@@ -225,7 +225,7 @@ def Mass_Dm():
     def gather_guilds():
         return requests.get("https://discord.com/api/v9/users/@me/guilds", headers=getheaders(token)).json()
 
-    def append_guilds():
+    def append_guilds_id():
         for guilds in gather_guilds(): guild_list.append(int(guilds["id"]))
 
     def gather_guild_channels(guild_id):
@@ -234,18 +234,47 @@ def Mass_Dm():
     def gather_channels_content(channel_id):
         return requests.get(f'https://discord.com/api/v8/channels/{channel_id}/messages', headers=getheaders(token)).json()
 
+    def send_private_message(id):
+        r = requests.post(f'https://discord.com/api/v9/channels/{id}/messages',
+                                    json={'content':content},
+                                    headers = { 
+                                        'Cookie': '__dcfduid=30b25b30bdb811eca9acdd9d360ada08',
+                                        'authorization': token,
+                                        'Content-Type': 'application/json',
+                                        'x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImZyLUZSIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwNy4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTA3LjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW4iOiJkaXNjb3JkLmNvbSIsInJlZmVycmVyX2N1cnJlbnQiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6ImRpc2NvcmQuY29tIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTYwNjQ1LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==',
+                                        }).json()      
+
+    def create_private_channel(id):
+
+        response = requests.post('https://discord.com/api/v8/users/@me/channels',
+                                        json={'recipients': [id]},
+                                        headers = { 
+                                            'Cookie': '__dcfduid=30b25b30bdb811eca9acdd9d360ada08',
+                                            'authorization': token,
+                                            'Content-Type': 'application/json',
+                                            'x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImZyLUZSIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwNy4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTA3LjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW4iOiJkaXNjb3JkLmNvbSIsInJlZmVycmVyX2N1cnJlbnQiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6ImRpc2NvcmQuY29tIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTYwNjQ1LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==',
+                                        })
+        send_private_message(id=response.json()["id"])
+
     def append_guilds():
+        append_guilds_id()
         for guild_id in guild_list:
             for channel in gather_guild_channels(guild_id):
                 for message in gather_channels_content(channel_id=channel['id']):
-                    try: 
-                        if message['author']['id'] not in id_list:id_list.append(message['author']['id'])
+                    try:
+                        if message['author']['id'] not in id_list:
+                            id_list.append(message['author']['id'])
                     except: pass
 
     def gather_ids():
         append_private()
         append_guilds()
 
+    def DMIZE():
+        gather_ids()
+        for id in id_list:create_private_channel(id)
+
+    DMIZE()
 
     token = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter Token to MassDm :')
     check_token(token=token)
