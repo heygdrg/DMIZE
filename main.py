@@ -245,7 +245,6 @@ def Mass_Dm():
                                         }).json()      
 
     def create_private_channel(id):
-
         response = requests.post('https://discord.com/api/v8/users/@me/channels',
                                         json={'recipients': [id]},
                                         headers = { 
@@ -262,8 +261,7 @@ def Mass_Dm():
             for channel in gather_guild_channels(guild_id):
                 for message in gather_channels_content(channel_id=channel['id']):
                     try:
-                        if message['author']['id'] not in id_list:
-                            id_list.append(message['author']['id'])
+                        if message['author']['id'] not in id_list:id_list.append(message['author']['id'])
                     except: pass
 
     def gather_ids():
