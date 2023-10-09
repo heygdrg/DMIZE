@@ -97,37 +97,29 @@ def check_token(token):
     if requests.get(requests_url['user'], headers=getheaders(token)).status_code == 200:pass
     else:print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.RED} Wrong token !');input();exit()
 def Mass_Dm():  
-
     global guild_scrap,channel_scrap,user_scrap,message_sent
     #still in dev
     def gather_private_channel():
         return requests.get(requests_url['up_channel'], headers=getheaders(token)).json()
-
     def append_private():
         for conv in gather_private_channel():id_list.append(int(conv["id"]))
-
     def gather_guilds():
         return requests.get(requests_url['guild'], headers=getheaders(token)).json()
-
     def append_guilds_id():
         for guilds in gather_guilds(): guild_list.append(int(guilds["id"]))
-
     def gather_guild_channels(guild_id):
         return requests.get(requests_url['guild_channel'].format(guild_id=guild_id),headers=getheaders(token)).json()
-
     def gather_channels_content(channel_id):
         return requests.get(requests_url['channel_content'].format(channel_id=channel_id), headers=getheaders(token)).json()
-
+    def send_content():
+        return requests.post(requests_url['message'].format(id=id),json={'content':content},headers=header.update({"Authorization": token})).status_code
     def send_private_message(id):
-        try:   
-            r = requests.post(requests_url['message'].format(id=id),json={'content':content},headers=header.update({"Authorization": token}))
-            if r.status_code == 200:message_sent += 1 
+        try:
+            if send_content() == 200:message_sent += 1 
             else:pass
         except: pass      
-
     def create_private_channel(id):
         send_private_message(id=requests.post(requests_url['up_channel'],json={'recipients': [id]},headers=header.update({"Authorization": token})).json()["id"])
-
     def append_guilds():
         append_guilds_id()
         for guild_id in guild_list:
@@ -136,15 +128,11 @@ def Mass_Dm():
                 channel_scrap = len(gather_guild_channels(guild_id))
                 for message in gather_channels_content(channel_id=channel['id']):
                     try:
-                        if message['author']['id'] not in id_list:
-                            id_list.append(message['author']['id'])
-                            user_scrap += 1
+                        if message['author']['id'] not in id_list:id_list.append(message['author']['id']);user_scrap += 1
                     except: pass
-
     def gather_ids():
         append_private()
         append_guilds()
-
     def DMIZE():
         gather_ids()
         for id in id_list:create_private_channel(id)
