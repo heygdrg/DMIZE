@@ -4,14 +4,11 @@ header,requests_url,modules, missing_modules,proxy_list,id_list, guild_list,guil
 def gather_modules():
     #in maintenance
     def install_module(module):
-        subprocess.run(['pip', 'install', module], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        
+        subprocess.run(['pip', 'install', module], stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
     def installing_module_prompt(module):
         print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.YELLOW}DOWNLOADING   {Fore.MAGENTA} installing.modules {Fore.WHITE} downloading module {module}.',install_module())
-
     def modules_install_prompt():
         print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.YELLOW}WARNING   {Fore.MAGENTA} missing.modules {Fore.WHITE} No modules to download on the system.')
-
     def installed_modules():
         for module_name in modules:
             try:importlib.import_module(module_name)
